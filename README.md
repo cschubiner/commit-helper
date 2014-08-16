@@ -31,3 +31,11 @@ Every person has a revolution beating within his or her chest -Adam Braun
 Thanks for using clay!
 ```
 
+
+##Other features
+
+Other features include:
+
+ - Checking out an existing branch
+ - Pushing to current branch
+ - Pushing to master
