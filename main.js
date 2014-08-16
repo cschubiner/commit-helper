@@ -86,10 +86,15 @@ function mainMenu() {
   var mainOptions = {
     CHECKOUT: 'Checkout a new branch using JIRA',
     CHECKOUT_EXISTING: 'Checkout an existing branch',
-    PUSH_CURR: 'Push to ' + currentBranch,
-    PUSH_MASTER: 'Push to master',
-    QUIT: 'View Aliases'
+    PUSH_CURR: 'Push to origin/' + currentBranch,
+    PUSH_MASTER: 'Push to origin/master',
+    QUIT: 'Quit'
   };
+
+  if (currentBranch === 'master') {
+    delete mainOptions.PUSH_CURR;
+  }
+
   var mainQuestionId = 'mainChoice';
   var mainQuestion = 'What do you want to do?';
 
