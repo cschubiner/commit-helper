@@ -3,12 +3,16 @@ commit-helper
 
 A command line interface to view your Jira tickets and checkout relevant branches.
 
-Installation:
+### Installation
 ```bash
 git clone git@github.com:cschubiner/commit-helper.git
 npm install -g commit-helper
 clay
 ```
+
+### Running commit-helper
+
+Simple type in the command `clay` on the command line and press enter!
 
 # Features
 
