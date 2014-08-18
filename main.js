@@ -86,6 +86,7 @@ function mainMenu() {
   var mainOptions = {
     CHECKOUT: 'Checkout a new branch using JIRA',
     CHECKOUT_EXISTING: 'Checkout an existing branch',
+    FETCH_REBASE: 'Fetch and rebase',
     PUSH_CURR: 'Push to origin/' + currentBranch,
     PUSH_MASTER: 'Push to origin/master',
     QUIT: 'Quit'
@@ -110,11 +111,39 @@ function mainMenu() {
       return checkoutExistingBranch();
     case mainOptions.PUSH_CURR:
       return pushToCurrentBranch(currentBranch);
+    case mainOptions.FETCH_REBASE:
+      return fetchAndRebase();
     case mainOptions.PUSH_MASTER:
       return pushToMasterBranch(currentBranch);
     case mainOptions.QUIT:
       break;
     }
+  });
+}
+
+function fetchAndRebase() {
+  var cmd = 'git fetch && git fetch origin && git rebase ';
+  var mainOptions = {
+    REGULAR: 'No (git rebase ...)',
+    INTERACTIVE: 'Yes (git rebase -i ...)'
+  };
+  var mainQuestionId = 'mainChoice';
+  var mainQuestion = 'Do you want to rebase interactively?';
+
+  return questions.misc.arbitraryList(
+    mainQuestionId,
+    mainQuestion,
+    _.values(mainOptions)
+  ).then(function (answer) {
+    switch (answer[mainQuestionId]) {
+    case mainOptions.INTERACTIVE:
+      cmd += '-i ';
+      break;
+    case mainOptions.REGULAR:
+      break;
+    }
+    cmd += 'origin/master';
+    return recommendCommand(cmd);
   });
 }
 
