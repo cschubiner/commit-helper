@@ -22,10 +22,14 @@ function logYellow(str) {
   console.log(chalk.yellow(str));
 }
 
-function recommendCommand(cmd) {
+function recommendCommand(cmd, cannotRun) {
   logGreen('clay recommends that you run the following command:');
   logYellow(spaces + cmd);
   a();
+
+  if (cannotRun) {
+    return;
+  }
 
   var mainOptions = {
     PROCEED: 'Yes',
@@ -135,15 +139,18 @@ function fetchAndRebase() {
     mainQuestion,
     _.values(mainOptions)
   ).then(function (answer) {
+    var cannotRun;
     switch (answer[mainQuestionId]) {
     case mainOptions.INTERACTIVE:
       cmd += '-i ';
+      cannotRun = true;
       break;
     case mainOptions.REGULAR:
+      cannotRun = false;
       break;
     }
     cmd += 'origin/master';
-    return recommendCommand(cmd);
+    return recommendCommand(cmd, cannotRun);
   });
 }
 
