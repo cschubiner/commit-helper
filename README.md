@@ -5,7 +5,7 @@ A command line interface to view your Jira tickets and checkout relevant branche
 
 ### Installation
 ```bash
-git clone git@github.com:cschubiner/commit-helper.git
+git clone https://github.com/cschubiner/commit-helper.git
 npm install -g commit-helper
 clay
 ```
