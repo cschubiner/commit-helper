@@ -5,7 +5,15 @@ var
   shell = require('shelljs'),
   quotes = require('./lib/quotes'),
   git = require('./lib/git'),
-  chalk = require('chalk');
+  chalk = require('chalk'),
+  COPY_TO_CLIPBOARD = true,
+  ASK_TO_COPY = false;
+
+function copyToClipboard(cmd) {
+  var willrun = "echo \"" + cmd + "\" |  tr -d '\\n' | pbcopy";
+  // console.log(willrun);
+  return shell.exec(willrun).code === 0;
+}
 
 function runCommand(cmd) {
   return shell.exec(cmd).code === 0;
@@ -22,7 +30,20 @@ function logYellow(str) {
   console.log(chalk.yellow(str));
 }
 
+function copyOrRunCommand(cmd) {
+  if (COPY_TO_CLIPBOARD) {
+    return copyToClipboard(cmd);
+  }
+  else {
+    return runCommand(cmd);
+  }
+}
+
 function recommendCommand(cmd, cannotRun) {
+  if (!cannotRun && COPY_TO_CLIPBOARD && !ASK_TO_COPY) {
+    return copyOrRunCommand(cmd);
+  }
+
   logGreen('clay recommends that you run the following command:');
   logYellow(spaces + cmd);
   a();
@@ -37,6 +58,9 @@ function recommendCommand(cmd, cannotRun) {
   };
   var mainQuestionId = 'mainChoice';
   var mainQuestion = 'do you want clay to do it for you?';
+  if (COPY_TO_CLIPBOARD) {
+    mainQuestion = 'do you want clay to copy it to the clipboard for you?';
+  }
 
   return questions.misc.arbitraryList(
     mainQuestionId,
@@ -45,7 +69,7 @@ function recommendCommand(cmd, cannotRun) {
   ).then(function (answer) {
     switch (answer[mainQuestionId]) {
     case mainOptions.PROCEED:
-      return runCommand(cmd);
+      return copyOrRunCommand(cmd);
     case mainOptions.QUIT:
       break;
     }
@@ -56,39 +80,26 @@ function gRep(str, repWhat, repWith) {
   return str.replace(new RegExp(repWhat.source, 'g'), repWith);
 }
 
-function getBranchCommand(branch, desc, initials) {
+function getBranchCommand(branch) {
   var cmd = 'git checkout -b "';
-  cmd += gRep(initials, /\s/, '-').toLowerCase();
-  cmd += '-';
   cmd += gRep(branch, /\s/, '-').toLowerCase();
-  cmd += '-';
-  cmd += gRep(desc, /\s/, '-');
   cmd += '"';
   return cmd;
 }
 
 function checkoutBranch() {
-  return questions.misc.arbitraryInput('branch', 'Enter JIRA ticket name (e.g. \'OKTA-39694\'): ').then(
+  return questions.misc.arbitraryInput('branch', 'Enter branch name: ').then(
     function (branchAns) {
-      return questions.misc.arbitraryInput('desc',
-        'Enter brief description (e.g. \'adds 1000 apps to db\'): ').then(
-        function (descAns) {
-          return questions.misc.arbitraryInput('initials',
-            'Enter your initials (e.g. \'CS\'): ').then(
-            function (initialsAns) {
-              var cmd = getBranchCommand(branchAns.branch, descAns.desc, initialsAns.initials);
-              return recommendCommand(cmd);
-            });
-        });
+      var cmd = getBranchCommand(branchAns.branch);
+      return recommendCommand(cmd);
     });
-
 }
 
 function mainMenu() {
 
   var currentBranch = git.getCurrentBranchName();
   var mainOptions = {
-    CHECKOUT: 'Checkout a new branch using JIRA',
+    CHECKOUT: 'Checkout a new branch',
     CHECKOUT_EXISTING: 'Checkout an existing branch',
     FETCH_REBASE: 'Fetch and rebase',
     PUSH_CURR: 'Push to origin/' + currentBranch,
@@ -143,7 +154,8 @@ function fetchAndRebase() {
     switch (answer[mainQuestionId]) {
     case mainOptions.INTERACTIVE:
       cmd += '-i ';
-      cannotRun = true;
+      // cannotRun = true;
+      cannotRun = false;
       break;
     case mainOptions.REGULAR:
       cannotRun = false;
