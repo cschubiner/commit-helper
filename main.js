@@ -103,6 +103,7 @@ function checkoutMaster() {
 
 function mainMenu() {
 
+  return checkoutExistingBranch();
   var currentBranch = git.getCurrentBranchName();
   var mainOptions = {
     CHECKOUT: 'Checkout a new branch',
