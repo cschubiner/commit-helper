@@ -32,6 +32,8 @@ function logYellow(str) {
 
 function copyOrRunCommand(cmd) {
   if (COPY_TO_CLIPBOARD) {
+    logYellow(cmd);
+    console.log('copied to clipboard.')
     return copyToClipboard(cmd);
   }
   else {
@@ -95,12 +97,17 @@ function checkoutBranch() {
     });
 }
 
+function checkoutMaster() {
+  return git.checkout('master');
+}
+
 function mainMenu() {
 
   var currentBranch = git.getCurrentBranchName();
   var mainOptions = {
     CHECKOUT: 'Checkout a new branch',
     CHECKOUT_EXISTING: 'Checkout an existing branch',
+    CHECKOUT_MASTER: 'Checkout master',
     FETCH_REBASE: 'Fetch and rebase',
     PUSH_CURR: 'Push to origin/' + currentBranch,
     PUSH_MASTER: 'Push to origin/master',
@@ -124,6 +131,8 @@ function mainMenu() {
       return checkoutBranch();
     case mainOptions.CHECKOUT_EXISTING:
       return checkoutExistingBranch();
+    case mainOptions.CHECKOUT_MASTER:
+      return checkoutMaster();
     case mainOptions.PUSH_CURR:
       return pushToCurrentBranch(currentBranch);
     case mainOptions.FETCH_REBASE:
