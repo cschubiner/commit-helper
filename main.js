@@ -218,8 +218,8 @@ function checkoutExistingBranch() {
   var branches = git.listBranches();
 
   return questions.misc.arbitraryList('branch', 'Which branch?', branches).then(function (answer) {
-    var branch = git.parseBranch(answer.branch).name;
-    return git.checkout(branch);
+    var branch = git.parseBranch(answer.branch).name.trim();
+    return recommendCommand(git.checkout(branch));
   });
 }
 
